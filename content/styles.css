@@ -1,0 +1,42 @@
+/* content/styles.css */
+
+.vibepaste-hover-overlay {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999999;
+  outline: 2px solid #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  display: none;
+  transition: all 0.1s ease-out;
+}
+
+.vibepaste-static-overlay {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999998;
+  outline: 2px solid #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.vibepaste-badge {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.vibepaste-badge:hover {
+  background-color: #ff0000;
+}
