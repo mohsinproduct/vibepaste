@@ -1,7 +1,7 @@
 /* content/styles.css */
 
 .vibepaste-hover-overlay {
-  position: fixed;
+  position: absolute;
   pointer-events: none;
   z-index: 999999;
   outline: 2px solid #007bff;
@@ -11,7 +11,7 @@
 }
 
 .vibepaste-static-overlay {
-  position: fixed;
+  position: absolute;
   pointer-events: none;
   z-index: 999998;
   outline: 2px solid #28a745;
@@ -39,4 +39,35 @@
 }
 .vibepaste-badge:hover {
   background-color: #ff0000;
+}
+
+.vibepaste-command-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000000;
+  background: #1e1e1e;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: none; /* Hidden by default */
+  width: 400px;
+}
+
+.vibepaste-command-bar input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #2d2d2d;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.vibepaste-command-bar input:focus {
+  border-color: #007bff;
 }
