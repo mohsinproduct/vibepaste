@@ -68,6 +68,11 @@ document.addEventListener('mousemove', (e) => {
 
   const target = e.target;
 
+  if (target && (target.closest('.vibepaste-command-bar') || target.classList.contains('vibepaste-hover-overlay') || target.closest('.vibepaste-static-overlay'))) {
+    overlay.style.display = 'none';
+    return;
+  }
+
   if (!target || target === document.body || target === document.documentElement) {
     overlay.style.display = 'none';
     return;
@@ -101,6 +106,10 @@ document.addEventListener('click', (e) => {
       if (overlayContainer && overlayContainer._vibeTarget) {
           target = overlayContainer._vibeTarget;
       }
+  }
+
+  if (target && target.closest('.vibepaste-command-bar')) {
+      return;
   }
 
   if (target && target !== document.body && target !== document.documentElement) {
@@ -168,19 +177,97 @@ document.body.appendChild(commandBar);
 
 const vibeInput = commandBar.querySelector('#vibe-input');
 
-vibeInput.addEventListener('keydown', (e) => {
+vibeInput.addEventListener('keydown', async (e) => {
   e.stopPropagation(); 
 
   if (e.key === 'Enter') {
-    sessionState.intent = vibeInput.value;
-    console.log(`VibePaste Intent Saved: "${sessionState.intent}"`);
+    sessionState.intent = vibeInput.value.trim();
+    
+    if (sessionState.selectedElements.length === 0) {
+      console.warn("VibePaste: No element selected!");
+      vibeInput.style.backgroundColor = '#8b0000';
+      setTimeout(() => vibeInput.style.backgroundColor = '#2d2d2d', 300);
+      return;
+    }
 
-    // flash green
-    vibeInput.style.backgroundColor = '#145c26'; 
-    setTimeout(() => vibeInput.style.backgroundColor = '#2d2d2d', 200);
+    try {
+      // 1. Loop through ALL selected elements instead of just [0]
+      const extractedElements = sessionState.selectedElements.map((el, index) => {
+        const data = extractElementData(el);
+        const selector = el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '');
+        
+        return {
+          index: index + 1, // Matches the blue badge number in your UI
+          selector: selector,
+          html: data.html,
+          styles: data.styles
+        };
+      });
+
+      // 2. Pass the entire array to our compiler
+      const finalPrompt = compilePrompt(
+        sessionState.mode, 
+        sessionState.intent, 
+        extractedElements
+      );
+
+      // 3. Copy to clipboard
+      await navigator.clipboard.writeText(finalPrompt);
+      console.log(`VibePaste: Copied ${extractedElements.length} elements to clipboard!`);
+
+      // 4. Visual feedback 
+      vibeInput.style.backgroundColor = '#145c26'; // Flash green
+      vibeInput.value = "Copied to clipboard! 🚀";
+    
+      setTimeout(() => {
+        toggleSelectionMode(); 
+      }, 700);
+
+    } catch (error) {
+      console.error("VibePaste Error generating prompt:", error);
+      vibeInput.value = "Error: Check console";
+      vibeInput.style.backgroundColor = '#8b0000';
+    }
   }
 });
 
 vibeInput.addEventListener('keyup', (e) => {
     e.stopPropagation();
 });
+
+
+function updateOverlayPositions() {
+  if (!sessionState.isActive) return;
+
+  document.querySelectorAll('.vibepaste-static-overlay').forEach(overlayBox => {
+    const el = overlayBox._vibeTarget;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    
+    
+    overlayBox.style.width = `${rect.width}px`;
+    overlayBox.style.height = `${rect.height}px`;
+    
+    overlayBox.style.top = `${rect.top + window.scrollY}px`;
+    overlayBox.style.left = `${rect.left + window.scrollX}px`;
+  });
+}
+let isUpdatingPosition = false;
+
+function onScrollOrResize() {
+  if (!sessionState.isActive) return;
+  overlay.style.display = 'none';
+
+  // If an update is already in the queue, ignore the event
+  if (!isUpdatingPosition) {
+    window.requestAnimationFrame(() => {
+      updateOverlayPositions();
+      isUpdatingPosition = false; // Reset the lock AFTER the frame is drawn
+    });
+    isUpdatingPosition = true; // Lock the queue
+  }
+}
+
+window.addEventListener('scroll', onScrollOrResize, { capture: true, passive: true });
+window.addEventListener('resize', onScrollOrResize, { passive: true });
