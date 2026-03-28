@@ -55,7 +55,7 @@
   width: 400px;
 }
 
-.vibepaste-command-bar input {
+.vibepaste-command-bar textarea {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #444;
@@ -66,8 +66,32 @@
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
+
+  resize: vertical;
+  overflow-y: auto;
+  min-height: 38px;
+  max-height: 150px;
+  field-sizing: content;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  &::-webkit-scrollbar {
+    display: none;
+  } /* Chrome/Safari/Opera */
+}
+.vibepaste-command-bar textarea:focus {
+  border-color: #007bff;
 }
 
-.vibepaste-command-bar input:focus {
-  border-color: #007bff;
+#vibe-mic-btn {
+  transition: transform 0.1s ease;
+  filter: grayscale(1);
+}
+
+#vibe-mic-btn:hover {
+  transform: scale(1.2);
+  filter: grayscale(0);
+}
+
+#vibe-mic-btn:active {
+  transform: scale(0.9);
 }

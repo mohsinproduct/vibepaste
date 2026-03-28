@@ -48,6 +48,11 @@ function toggleSelectionMode() {
     sessionState.selectedElements = [];
     sessionState.intent = "";
     vibeInput.value = "";
+
+    if (isListening && recognition) {
+      recognition.stop();
+    }
+
     redrawAllOverlays();
   } else {
     commandBar.style.display = 'block';
@@ -172,10 +177,92 @@ document.addEventListener('keyup', (e) => {
 // command bar ui
 const commandBar = document.createElement('div');
 commandBar.className = 'vibepaste-command-bar';
-commandBar.innerHTML = `<input type="text" id="vibe-input" placeholder="What should the AI do? (Press Enter)" autocomplete="off">`;
+commandBar.innerHTML = `
+  <div style="display: flex; gap: 8px; align-items: flex-end;">
+    <textarea id="vibe-input" placeholder="What should the AI do? (Press Enter)" rows="1" autocomplete="off"></textarea>
+    <button id="vibe-mic-btn" title="Voice Input" style="background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; margin-bottom: 6px;">🎙️</button>
+  </div>
+`;
 document.body.appendChild(commandBar);
 
 const vibeInput = commandBar.querySelector('#vibe-input');
+const micBtn = commandBar.querySelector('#vibe-mic-btn');
+
+
+
+// voice recognition
+let recognition = null;
+let isListening = false;
+let textBeforeMic = '';
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  micBtn.addEventListener('click', () => {
+    if (!isListening) {
+      textBeforeMic = vibeInput.value.trim(); 
+      if (textBeforeMic.length > 0) textBeforeMic += ' ';
+      recognition.start();
+    } else {
+      recognition.stop();
+    }
+  });
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.textContent = '🛑';
+    micBtn.style.filter = "grayscale(0) sepia(1) hue-rotate(320deg)";
+    vibeInput.placeholder = "Listening...";
+  };
+
+  recognition.onresult = (event) => {
+    let currentVoiceSession = '';
+
+    for (let i = 0; i < event.results.length; ++i) {
+      currentVoiceSession += event.results[i][0].transcript;
+    }
+
+    vibeInput.value = textBeforeMic + currentVoiceSession;
+    sessionState.intent = vibeInput.value;
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.textContent = '🎙️';
+    micBtn.style.filter = "grayscale(1)";
+    vibeInput.placeholder = "What should the AI do? (Press Enter)";
+    vibeInput.focus();
+  };
+
+  recognition.onerror = (event) => {
+    console.error("VibePaste Voice Error:", event.error);
+    isListening = false;
+    micBtn.textContent = '🎙️';
+    micBtn.style.filter = "grayscale(1)";
+  }; 
+
+  vibeInput.addEventListener('input', (e) => {
+    sessionState.intent = e.target.value;
+  });
+
+} else {
+  micBtn.style.display = 'none'; 
+  console.warn("VibePaste: Web Speech API not supported in this browser.");
+}
+
+
+vibeInput.addEventListener('input', (e) => {
+  sessionState.intent = e.target.value;
+  if (isListening && recognition) {
+    recognition.stop();
+  }
+});
+
 
 vibeInput.addEventListener('keydown', async (e) => {
   e.stopPropagation(); 
@@ -191,31 +278,31 @@ vibeInput.addEventListener('keydown', async (e) => {
     }
 
     try {
-      // 1. Loop through ALL selected elements instead of just [0]
+      // Loop through ALL selected elements instead of just [0]
       const extractedElements = sessionState.selectedElements.map((el, index) => {
         const data = extractElementData(el);
         const selector = el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '');
         
         return {
-          index: index + 1, // Matches the blue badge number in your UI
+          index: index + 1, 
           selector: selector,
           html: data.html,
           styles: data.styles
         };
       });
 
-      // 2. Pass the entire array to our compiler
+      // pass the entire array to our compiler
       const finalPrompt = compilePrompt(
         sessionState.mode, 
         sessionState.intent, 
         extractedElements
       );
 
-      // 3. Copy to clipboard
+      // copy to clipboard
       await navigator.clipboard.writeText(finalPrompt);
       console.log(`VibePaste: Copied ${extractedElements.length} elements to clipboard!`);
 
-      // 4. Visual feedback 
+      // visual feedback 
       vibeInput.style.backgroundColor = '#145c26'; // Flash green
       vibeInput.value = "Copied to clipboard! 🚀";
     
@@ -259,13 +346,12 @@ function onScrollOrResize() {
   if (!sessionState.isActive) return;
   overlay.style.display = 'none';
 
-  // If an update is already in the queue, ignore the event
   if (!isUpdatingPosition) {
     window.requestAnimationFrame(() => {
       updateOverlayPositions();
-      isUpdatingPosition = false; // Reset the lock AFTER the frame is drawn
+      isUpdatingPosition = false; 
     });
-    isUpdatingPosition = true; // Lock the queue
+    isUpdatingPosition = true; 
   }
 }
 
