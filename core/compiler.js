@@ -1,13 +1,14 @@
 // core/compiler.js
 
-function buildElementsBlock(elements, isFixMode) {
-  return elements.map(el => {
-    const stylesString = Object.entries(el.styles)
-      .map(([prop, value]) => `${prop}: ${value};`)
-      .join('\n');
+window.VibeCompiler = {
+  buildElementsBlock: function(elements, isFixMode) {
+    return elements.map(el => {
+      const stylesString = Object.entries(el.styles)
+        .map(([prop, value]) => `${prop}: ${value};`)
+        .join('\n');
 
-    if (isFixMode) {
-      return `
+      if (isFixMode) {
+        return `
 <element index="${el.index}">
   <selector>${el.selector}</selector>
   <current_html>
@@ -17,8 +18,8 @@ ${el.html}
 ${stylesString}
   </computed_styles>
 </element>`.trim();
-    } else {
-      return `
+      } else {
+        return `
 <element index="${el.index}">
   <selector>${el.selector}</selector>
   <structure>
@@ -28,12 +29,12 @@ ${el.html}
 ${stylesString}
   </visual_vibe>
 </element>`.trim();
-    }
-  }).join('\n\n');
-}
+      }
+    }).join('\n\n');
+  },
 
-function compileFixModePrompt(intent, elementsBlock) {
-  return `<system>
+  compileFixModePrompt: function(intent, elementsBlock) {
+    return `<system>
 You are an expert frontend developer. Your task is to modify specific UI elements based on the user's intent. Output ONLY the necessary code changes to achieve the goal. Maintain the existing styling approach (e.g., Tailwind, Bootstrap, CSS modules) based on the provided classes and structure.
 </system>
 
@@ -44,10 +45,10 @@ You are an expert frontend developer. Your task is to modify specific UI element
 ${elementsBlock}
 </target_elements>
 </context>`;
-}
+  },
 
-function compileInspirationModePrompt(intent, elementsBlock) {
-  return `<system>
+  compileInspirationModePrompt: function(intent, elementsBlock) {
+    return `<system>
 You are an expert UI/UX engineer. Analyze the provided UI elements to extract design patterns, layout, and visual hierarchy. Generate a clean, robust, and reusable component based on the user's intent. Do not just copy the provided code blindly; build a proper abstraction.
 </system>
 
@@ -58,18 +59,16 @@ You are an expert UI/UX engineer. Analyze the provided UI elements to extract de
 ${elementsBlock}
 </reference_elements>
 </context>`;
-}
+  },
 
-function compilePrompt(mode, intent, extractedElements) {
-  const isFixMode = mode === 'fix';
-  const elementsBlock = buildElementsBlock(extractedElements, isFixMode);
+  compilePrompt: function(mode, intent, extractedElements) {
+    const isFixMode = mode === 'fix';
+    const elementsBlock = this.buildElementsBlock(extractedElements, isFixMode);
 
-  if (isFixMode) {
-    return compileFixModePrompt(intent, elementsBlock);
-  } else if (mode === 'copy') {
-    return compileInspirationModePrompt(intent, elementsBlock);
-  } else {
-    console.warn(`VibePaste: Unknown mode '${mode}', defaulting to Fix Mode.`);
-    return compileFixModePrompt(intent, elementsBlock);
+    if (isFixMode) {
+      return this.compileFixModePrompt(intent, elementsBlock);
+    } else {
+      return this.compileInspirationModePrompt(intent, elementsBlock);
+    }
   }
-}
+};

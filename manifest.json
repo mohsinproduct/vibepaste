@@ -25,7 +25,9 @@
       "js": [
         "shared/constants.js", 
         "core/extractor.js", 
-        "core/compiler.js", 
+        "core/compiler.js",
+        "content/ui.js",
+        "content/voice.js",
         "content/selection.js"
       ]
     }
