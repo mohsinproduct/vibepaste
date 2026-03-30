@@ -1,18 +1,18 @@
 // content/selection.js
 
 let sessionState = {
-  selectedElements: [],
-  mode: 'fix',
+  mode: window.VP_Constants.MODES.FIX,
   isActive: false,
   isPaused: false,
-  intent: ""
+  intent: "",
+  selectedElements: []
 };
 
 // initialize ui & grab the inputs
-const { input: vibeInput, micBtn } = window.VibeUI.init();
+const { input: vpInput, micBtn } = window.VP_UI.init();
 
 // initialize voice module
-window.VibeVoice.init(micBtn, vibeInput, (newText) => {
+window.VP_Voice.init(micBtn, vpInput, (newText) => {
   sessionState.intent = newText;
 });
 
@@ -20,17 +20,17 @@ function toggleSelectionMode() {
   sessionState.isActive = !sessionState.isActive;
 
   if (!sessionState.isActive) {
-    window.VibeUI.hideHoverOverlay();
-    window.VibeUI.toggleCommandBar(false);
+    window.VP_UI.hideHoverOverlay();
+    window.VP_UI.toggleCommandBar(false);
     sessionState.selectedElements = [];
     sessionState.intent = "";
-    vibeInput.value = "";
+    vpInput.value = "";
 
-    window.VibeVoice.stop();
+    window.VP_Voice.stop();
     redrawAllOverlays();
   } else {
-    window.VibeUI.toggleCommandBar(true);
-    vibeInput.focus();
+    window.VP_UI.toggleCommandBar(true);
+    vpInput.focus();
   }
   console.log(`VibePaste: Selection mode ${sessionState.isActive ? 'ON' : 'OFF'}`);
 }
@@ -48,23 +48,23 @@ document.addEventListener('mousemove', (e) => {
   const target = e.target;
 
   if (target && (target.closest('.vibepaste-command-bar') || target.classList.contains('vibepaste-hover-overlay') || target.closest('.vibepaste-static-overlay'))) {
-    window.VibeUI.hideHoverOverlay();
+    window.VP_UI.hideHoverOverlay();
     return;
   }
 
   if (!target || target === document.body || target === document.documentElement) {
-    window.VibeUI.hideHoverOverlay();
+    window.VP_UI.hideHoverOverlay();
     return;
   }
 
   if (sessionState.selectedElements.includes(target)) {
-    window.VibeUI.hideHoverOverlay();
+    window.VP_UI.hideHoverOverlay();
     return;
   }
 
   const elProps = target.getBoundingClientRect();
   const style = window.getComputedStyle(target);
-  window.VibeUI.showHoverOverlay(elProps, style.borderRadius);
+  window.VP_UI.showHoverOverlay(elProps, style.borderRadius);
 });
 
 // to select clicked element 
@@ -75,8 +75,8 @@ document.addEventListener('click', (e) => {
 
   if (target.classList.contains('vibepaste-badge')) {
       const overlayContainer = target.parentElement;
-      if (overlayContainer && overlayContainer._vibeTarget) {
-          target = overlayContainer._vibeTarget;
+      if (overlayContainer && overlayContainer._vpTarget) {
+          target = overlayContainer._vpTarget;
       }
   }
 
@@ -98,23 +98,23 @@ document.addEventListener('click', (e) => {
       console.log(`VibePaste: Element selected. Total: ${sessionState.selectedElements.length}`);
     }
 
-    window.VibeUI.hideHoverOverlay();
+    window.VP_UI.hideHoverOverlay();
     redrawAllOverlays();
-    vibeInput.focus();
+    vpInput.focus();
   }
 }, true);
 
 // to clean display
 document.addEventListener('mouseleave', () => {
   if (!sessionState.isActive) return;
-  window.VibeUI.hideHoverOverlay();
+  window.VP_UI.hideHoverOverlay();
 });
 
 // to sync UI with state
 function redrawAllOverlays() {
-  window.VibeUI.clearAllStaticOverlays();
+  window.VP_UI.clearAllStaticOverlays();
   sessionState.selectedElements.forEach((el, index) => {
-    window.VibeUI.createStaticOverlay(el, index + 1); 
+    window.VP_UI.createStaticOverlay(el, index + 1);
   });
 }
 
@@ -134,7 +134,7 @@ document.addEventListener('keyup', (e) => {
     sessionState.isPaused = !sessionState.isPaused;
 
     if (sessionState.isPaused) {
-      window.VibeUI.hideHoverOverlay();
+      window.VP_UI.hideHoverOverlay();
       console.log('VibePaste: Paused for Interaction');
     } else {
       console.log('VibePaste: Resumed Selection');
@@ -142,12 +142,17 @@ document.addEventListener('keyup', (e) => {
   }
 });
 
-vibeInput.addEventListener('input', (e) => {
+vpInput.addEventListener('input', (e) => {
   sessionState.intent = e.target.value;
-  window.VibeVoice.stop();
+  window.VP_Voice.stop();
 });
 
-vibeInput.addEventListener('keydown', async (e) => {
+vpInput.addEventListener('keydown', async (e) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    toggleSelectionMode();
+    return;
+  }
   e.stopPropagation(); 
 
   if (e.key === 'Enter') {
@@ -155,59 +160,46 @@ vibeInput.addEventListener('keydown', async (e) => {
     if (e.shiftKey) return; 
     
     e.preventDefault();
-    window.VibeVoice.stop();
-    sessionState.intent = vibeInput.value.trim();
+    window.VP_Voice.stop();
+    sessionState.intent = vpInput.value.trim();
     
     if (sessionState.selectedElements.length === 0) {
       console.warn("VibePaste: No element selected!");
-      vibeInput.style.backgroundColor = '#8b0000';
-      setTimeout(() => vibeInput.style.backgroundColor = '#2d2d2d', 300);
+      vpInput.classList.add('vibepaste-input-error');
+      setTimeout(() => vpInput.classList.remove('vibepaste-input-error'), 300);
       return;
     }
 
-    try {
-      // Loop through ALL selected elements
-      const extractedElements = sessionState.selectedElements.map((el, index) => {
-        
-        const data = window.VibeExtractor.extractElementData(el); 
-        const selector = el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '');
-        
-        return {
-          index: index + 1, 
-          selector: selector,
-          html: data.html,
-          styles: data.styles
-        };
-      });
+    const result = await window.VP_Action.execute(
+      sessionState.selectedElements,
+      sessionState.mode,
+      sessionState.intent
+    );
 
-      
-      const finalPrompt = window.VibeCompiler.compilePrompt( 
-        sessionState.mode, 
-        sessionState.intent, 
-        extractedElements
-      );
-
-      // copy to clipboard
-      await navigator.clipboard.writeText(finalPrompt);
-      console.log(`VibePaste: Copied ${extractedElements.length} elements to clipboard!`);
-
-      // visual feedback 
-      vibeInput.style.backgroundColor = '#145c26'; 
-      vibeInput.value = "Copied to clipboard! 🚀";
+    if (result.success) {
+      console.log(`VibePaste: Copied ${result.count} elements to clipboard!`);
+      vpInput.classList.add('vibepaste-input-success');
+      vpInput.value = "Copied to clipboard! 🚀";
     
       setTimeout(() => {
-        toggleSelectionMode(); 
+        vpInput.classList.remove('vibepaste-input-success');
+        toggleSelectionMode();
       }, 700);
 
-    } catch (error) {
-      console.error("VibePaste Error generating prompt:", error);
-      vibeInput.value = "Error: Check console";
-      vibeInput.style.backgroundColor = '#8b0000';
+    } else {
+      vpInput.value = "Error: Check console";
+      vpInput.classList.add('vibepaste-input-error');
+      
+      setTimeout(() => {
+        vpInput.classList.remove('vibepaste-input-error');
+        toggleSelectionMode();
+      }, 2000);
     }
   }
 });
 
-vibeInput.addEventListener('keyup', (e) => {
+
+vpInput.addEventListener('keyup', (e) => {
     e.stopPropagation();
 });
 
@@ -215,7 +207,7 @@ function updateOverlayPositions() {
   if (!sessionState.isActive) return;
 
   document.querySelectorAll('.vibepaste-static-overlay').forEach(overlayBox => {
-    const el = overlayBox._vibeTarget;
+    const el = overlayBox._vpTarget;
     if (!el) return;
 
     const rect = el.getBoundingClientRect();
@@ -230,9 +222,10 @@ function updateOverlayPositions() {
 
 let isUpdatingPosition = false;
 
-function onScrollOrResize() {
+// 1. onscroll ui handler
+function onScroll() {
   if (!sessionState.isActive) return;
-  window.VibeUI.hideHoverOverlay();
+  window.VP_UI.hideHoverOverlay();
 
   if (!isUpdatingPosition) {
     window.requestAnimationFrame(() => {
@@ -243,5 +236,21 @@ function onScrollOrResize() {
   }
 }
 
-window.addEventListener('scroll', onScrollOrResize, { capture: true, passive: true });
-window.addEventListener('resize', onScrollOrResize, { passive: true });
+// 2. on resize ui handler
+let resizeTimeout;
+function onResize() {
+  if (!sessionState.isActive) return;
+  window.VP_UI.hideHoverOverlay();
+
+  // Clear the timer if the window is still moving
+  clearTimeout(resizeTimeout);
+  
+  // Wait 100ms after the window STOPS moving before drawing the boxes
+  resizeTimeout = setTimeout(() => {
+    updateOverlayPositions();
+  }, 100);
+}
+
+// Attach the separated listeners
+window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+window.addEventListener('resize', onResize, { passive: true });

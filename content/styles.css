@@ -1,8 +1,13 @@
 /* content/styles.css */
 
-.vibepaste-hover-overlay {
+/* overlays */
+.vibepaste-hover-overlay,
+.vibepaste-static-overlay {
   position: absolute;
   pointer-events: none;
+}
+
+.vibepaste-hover-overlay {
   z-index: 999999;
   outline: 2px solid #007bff;
   background-color: rgba(0, 123, 255, 0.1);
@@ -11,13 +16,12 @@
 }
 
 .vibepaste-static-overlay {
-  position: absolute;
-  pointer-events: none;
   z-index: 999998;
   outline: 2px solid #28a745;
   background-color: rgba(40, 167, 69, 0.1);
 }
 
+/* badge (numbering) */
 .vibepaste-badge {
   position: absolute;
   top: -12px;
@@ -37,10 +41,12 @@
   pointer-events: auto;
   cursor: pointer;
 }
+
 .vibepaste-badge:hover {
   background-color: #ff0000;
 }
 
+/* command bar & input --- */
 .vibepaste-command-bar {
   position: fixed;
   bottom: 24px;
@@ -66,7 +72,6 @@
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
-
   resize: vertical;
   overflow-y: auto;
   min-height: 38px;
@@ -74,24 +79,47 @@
   field-sizing: content;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+
   &::-webkit-scrollbar {
-    display: none;
-  } /* Chrome/Safari/Opera */
+    display: none; /* Chrome/Safari/Opera */
+  }
 }
+
 .vibepaste-command-bar textarea:focus {
   border-color: #007bff;
 }
 
-#vibe-mic-btn {
-  transition: transform 0.1s ease;
+/* mic button */
+#vibepaste-mic-btn {
+  transition:
+    transform 0.1s ease,
+    filter 0.1s ease;
   filter: grayscale(1);
 }
 
-#vibe-mic-btn:hover {
+#vibepaste-mic-btn:hover {
   transform: scale(1.2);
   filter: grayscale(0);
 }
 
-#vibe-mic-btn:active {
+#vibepaste-mic-btn:active {
   transform: scale(0.9);
+}
+
+.vibepaste-mic-active {
+  filter: grayscale(0) sepia(1) hue-rotate(320deg) !important;
+}
+
+/* dynamic input states */
+.vibepaste-input-success,
+.vibepaste-input-error {
+  color: white !important;
+}
+
+.vibepaste-input-success {
+  background-color: #145c26 !important;
+}
+
+.vibepaste-input-error {
+  background-color: #8b0000 !important;
 }

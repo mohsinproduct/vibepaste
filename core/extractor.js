@@ -1,12 +1,27 @@
 // core/extractor.js
 
-window.VibeExtractor = {
+window.VP_Extractor = {
   KEY_STYLES: [
     'display', 'flex-direction', 'justify-content', 'align-items', 'gap',
     'padding', 'margin', 'width', 'height',
     'color', 'background-color', 'border', 'border-radius',
     'font-size', 'font-weight', 'text-align'
   ],
+
+  generateSelector: function(el) {
+    let selector = el.tagName.toLowerCase();
+    
+    if (el.id) {
+      selector += `#${el.id}`;
+    } else if (el.className && typeof el.className === 'string') {
+      // to grab up to first 3 classes & ignore empty strings
+      const classes = el.className.trim().split(/\s+/).filter(Boolean).slice(0, 3);
+      if (classes.length > 0) {
+        selector += '.' + classes.join('.');
+      }
+    }
+    return selector;
+  },
 
   extractStyles: function(element) {
     const computed = window.getComputedStyle(element);

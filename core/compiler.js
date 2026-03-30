@@ -1,6 +1,6 @@
 // core/compiler.js
 
-window.VibeCompiler = {
+window.VP_Compiler = {
   buildElementsBlock: function(elements, isFixMode) {
     return elements.map(el => {
       const stylesString = Object.entries(el.styles)
@@ -47,7 +47,7 @@ ${elementsBlock}
 </context>`;
   },
 
-  compileInspirationModePrompt: function(intent, elementsBlock) {
+  compileCopyModePrompt: function(intent, elementsBlock) {
     return `<system>
 You are an expert UI/UX engineer. Analyze the provided UI elements to extract design patterns, layout, and visual hierarchy. Generate a clean, robust, and reusable component based on the user's intent. Do not just copy the provided code blindly; build a proper abstraction.
 </system>
@@ -62,13 +62,13 @@ ${elementsBlock}
   },
 
   compilePrompt: function(mode, intent, extractedElements) {
-    const isFixMode = mode === 'fix';
+    const isFixMode = mode === window.VP_Constants.MODES.FIX;
     const elementsBlock = this.buildElementsBlock(extractedElements, isFixMode);
 
     if (isFixMode) {
       return this.compileFixModePrompt(intent, elementsBlock);
     } else {
-      return this.compileInspirationModePrompt(intent, elementsBlock);
+      return this.compileCopyModePrompt(intent, elementsBlock);
     }
   }
 };

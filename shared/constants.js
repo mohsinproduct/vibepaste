@@ -1,5 +1,7 @@
 // constants.js
-export const MODES = {
-  FIX: 'fix',
-  COPY: 'copy'
+window.VP_Constants = {
+  MODES: {
+    FIX: 'fix',
+    COPY: 'copy'
+  }
 };

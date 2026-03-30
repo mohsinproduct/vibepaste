@@ -26,6 +26,7 @@
         "shared/constants.js", 
         "core/extractor.js", 
         "core/compiler.js",
+        "core/action.js",
         "content/ui.js",
         "content/voice.js",
         "content/selection.js"

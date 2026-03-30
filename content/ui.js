@@ -1,9 +1,9 @@
 // content/ui.js
 
-window.VibeUI = {
+  window.VP_UI = {
   hoverOverlay: null,
   commandBar: null,
-  vibeInput: null,
+  vpInput: null,
   micBtn: null,
 
   init: function() {
@@ -17,17 +17,17 @@ window.VibeUI = {
     this.commandBar.className = 'vibepaste-command-bar';
     this.commandBar.innerHTML = `
       <div style="display: flex; gap: 8px; align-items: flex-end;">
-        <textarea id="vibe-input" placeholder="What should the AI do? (Press Enter)" rows="1" autocomplete="off"></textarea>
-        <button id="vibe-mic-btn" title="Voice Input" style="background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; margin-bottom: 6px;">🎙️</button>
+        <textarea id="vibepaste-input" placeholder="What should the AI do? (Press Enter)" rows="1" autocomplete="off"></textarea>
+        <button id="vibepaste-mic-btn" title="Voice Input" style="background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; margin-bottom: 6px;">🎙️</button>
       </div>
     `;
     
     document.body.appendChild(this.commandBar);
 
-    this.vibeInput = this.commandBar.querySelector('#vibe-input');
-    this.micBtn = this.commandBar.querySelector('#vibe-mic-btn');
+    this.vpInput = this.commandBar.querySelector('#vibepaste-input');
+    this.micBtn = this.commandBar.querySelector('#vibepaste-mic-btn');
 
-    return { input: this.vibeInput, micBtn: this.micBtn };
+    return { input: this.vpInput, micBtn: this.micBtn };
   },
 
   createStaticOverlay: function(el, number) {
@@ -36,7 +36,7 @@ window.VibeUI = {
 
     const staticOverlay = document.createElement('div');
     staticOverlay.className = 'vibepaste-static-overlay';
-    staticOverlay._vibeTarget = el;
+    staticOverlay._vpTarget = el;
 
     staticOverlay.style.width = `${rect.width}px`;
     staticOverlay.style.height = `${rect.height}px`;
@@ -75,7 +75,7 @@ window.VibeUI = {
       this.commandBar.style.display = show ? 'block' : 'none';
       if (show) {
         setTimeout(() => {
-          this.vibeInput.focus();
+          this.vpInput.focus();
         }, 10);
       }
     }
