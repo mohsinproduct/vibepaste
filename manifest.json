@@ -3,21 +3,28 @@
   "name": "VibePaste",
   "version": "0.1.0",
   "description": "Capture UI elements for AI coding prompts.",
-  "permissions": ["activeTab", "storage", "scripting"],
+  "permissions": ["activeTab", "storage", "scripting","unlimitedStorage"],
+
   "action": {
     "default_title": "VibePaste"
   },
+
   "background": {
     "service_worker": "background/service-worker.js"
   },
+
+
   "commands": {
     "toggle-selection": {
-      "suggested_key": {
-        "default": "Alt+C"
-      },
-      "description": "Toggle Element Selection"
+      "suggested_key": { "default": "Alt+C" },
+      "description": "ON/OFF Element Selection"
+    },
+    "vibe-paste": {
+      "suggested_key": { "default": "Alt+V" },
+      "description": "Paste VibePaste Data"
     }
   },
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -29,7 +36,8 @@
         "core/action.js",
         "content/ui.js",
         "content/voice.js",
-        "content/selection.js"
+        "content/selection.js",
+        "content/injector.js"
       ]
     }
   ]

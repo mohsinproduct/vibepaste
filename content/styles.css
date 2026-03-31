@@ -123,3 +123,14 @@
 .vibepaste-input-error {
   background-color: #8b0000 !important;
 }
+
+/* for screenshot */
+.vibepaste-capturing .vibepaste-command-bar,
+.vibepaste-capturing .vibepaste-hover-overlay {
+  display: none !important;
+}
+
+.vibepaste-capturing .vibepaste-static-overlay {
+  background: transparent;
+  outline: 1px dashed rgba(40, 167, 69, 0.5);
+}

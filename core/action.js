@@ -18,19 +18,47 @@ window.VP_Action = {
         };
       });
 
+      document.body.classList.add('vibepaste-capturing');
+      
+      await new Promise(resolve => {
+        window.requestAnimationFrame(() => {
+          setTimeout(resolve, 150);
+        });
+      });
+
+      const screenshotResponse = await chrome.runtime.sendMessage({ action: "CAPTURE_SCREENSHOT" });
+
+      document.body.classList.remove('vibepaste-capturing');
+
+      let screenshotDataUrl = null;
+      
+      if (screenshotResponse && screenshotResponse.success) {
+        screenshotDataUrl = screenshotResponse.dataUrl;
+        console.log("VibePaste: Screenshot captured successfully!");
+      } else {
+        console.warn("VibePaste: Failed to capture screenshot. Proceeding with text only.");
+      }
+
       // to Master Prompt
       const finalPrompt = window.VP_Compiler.compilePrompt(
         mode, 
         intent, 
-        extractedElements
+        extractedElements,
+        screenshotDataUrl
       );
 
-      // to clipboard
-      await navigator.clipboard.writeText(finalPrompt);
+      // save to extension's storage
+      await chrome.storage.local.set({
+        vibepaste_data: {
+          text: finalPrompt,
+          image: screenshotDataUrl
+        }
+      });
 
       return { success: true, count: extractedElements.length };
 
     } catch (error) {
+      document.body.classList.remove('vibepaste-capturing'); 
       console.error("VibePaste Action Error:", error);
       return { success: false, error: error.message };
     }
