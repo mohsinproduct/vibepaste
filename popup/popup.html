@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VibePaste Control</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="preload-transitions">
+    <header class="vp-header">
+      <h1><span class="magic-sparkle">✨</span> VibePaste</h1>
+    </header>
+
+    <div class="vp-mode-container">
+      <div class="vp-toggle-wrapper">
+        <input type="radio" id="mode-fix" name="vp-mode" value="fix" checked />
+        <label for="mode-fix" class="vp-toggle-btn">🔧 Fix</label>
+
+        <input type="radio" id="mode-copy" name="vp-mode" value="copy" />
+        <label for="mode-copy" class="vp-toggle-btn">📋 Copy</label>
+
+        <div class="vp-toggle-slider"></div>
+      </div>
+    </div>
+
+    <div class="vp-action-container">
+      <button id="btn-capture" class="vp-hero-btn">
+        <span class="target-icon">🎯</span> Start Capturing
+      </button>
+    </div>
+
+    <hr class="vp-divider" />
+    <div class="vp-setting-row">
+      <span title="Include a shot of user-visible screen">🖼️ Include Screenshot</span>
+      <label class="vp-switch">
+        <input type="checkbox" id="toggle-screenshot" checked />
+        <span class="vp-slider"></span>
+      </label>
+    </div>
+    <hr class="vp-divider" />
+    <div class="vp-setting-row">
+      <span title="Starts listening when you select your first element"
+        >🎙️ Auto-Start Mic</span
+      >
+      <label class="vp-switch">
+        <input type="checkbox" id="toggle-auto-mic" />
+        <span class="vp-slider"></span>
+      </label>
+    </div>
+
+    <hr class="vp-divider" />
+    <div class="vp-footer">
+      <div class="vp-shortcuts">
+        <p><strong>Alt+C</strong>: Start/Stop Capturing</p>
+        <p><strong>Alt+V</strong>: Paste Captured</p>
+        <p><strong>Alt+P</strong>: Pause/Unpause to Interact</p>
+      </div>
+      <div class="vp-footer-actions">
+        <button id="btn-shortcuts" class="vp-btn-secondary">
+          ⌨ Edit Shortcuts
+        </button>
+        <button id="btn-reset" class="vp-btn-danger">🔄 Reset</button>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

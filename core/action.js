@@ -1,3 +1,5 @@
+// core/action.js
+
 window.VP_Action = {
   execute: async function(selectedElements, mode, intent) {
     if (!selectedElements || selectedElements.length === 0) {
@@ -5,7 +7,7 @@ window.VP_Action = {
     }
 
     try {
-      // extract selected elements data
+      // Extract selected elements data
       const extractedElements = selectedElements.map((el, index) => {
         const data = window.VP_Extractor.extractElementData(el);
         const selector = window.VP_Extractor.generateSelector(el);
@@ -18,28 +20,37 @@ window.VP_Action = {
         };
       });
 
-      document.body.classList.add('vibepaste-capturing');
+      // take SS only if the setting is ON
+      const storageData = await chrome.storage.local.get(['vp_include_screenshot']);
       
-      await new Promise(resolve => {
-        window.requestAnimationFrame(() => {
-          setTimeout(resolve, 150);
-        });
-      });
-
-      const screenshotResponse = await chrome.runtime.sendMessage({ action: "CAPTURE_SCREENSHOT" });
-
-      document.body.classList.remove('vibepaste-capturing');
-
+      const shouldTakeScreenshot = storageData.vp_include_screenshot !== false; 
+      
       let screenshotDataUrl = null;
-      
-      if (screenshotResponse && screenshotResponse.success) {
-        screenshotDataUrl = screenshotResponse.dataUrl;
-        console.log("VibePaste: Screenshot captured successfully!");
+
+      if (shouldTakeScreenshot) {
+        document.body.classList.add('vibepaste-capturing');
+        
+        await new Promise(resolve => {
+          window.requestAnimationFrame(() => {
+            setTimeout(resolve, 150);
+          });
+        });
+
+        const screenshotResponse = await chrome.runtime.sendMessage({ action: "CAPTURE_SCREENSHOT" });
+
+        document.body.classList.remove('vibepaste-capturing');
+
+        if (screenshotResponse && screenshotResponse.success) {
+          screenshotDataUrl = screenshotResponse.dataUrl;
+          console.log("VibePaste: Screenshot captured successfully!");
+        } else {
+          console.warn("VibePaste: Failed to capture screenshot. Proceeding with text only.");
+        }
       } else {
-        console.warn("VibePaste: Failed to capture screenshot. Proceeding with text only.");
+        console.log("VibePaste: Screenshot skipped (disabled in settings).");
       }
 
-      // to Master Prompt
+      // dompile Master Prompt
       const finalPrompt = window.VP_Compiler.compilePrompt(
         mode, 
         intent, 

@@ -1,7 +1,8 @@
 // background/service-worker.js 
 
+// listen for Keyboard Shortcuts (Alt+C, Alt+V)
 chrome.commands.onCommand.addListener((command) => {
-  if (command === "toggle-selection") {
+  if (command === "capture-vibe") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]) {
         chrome.tabs.sendMessage(tabs[0].id, { action: "TOGGLE_SELECTION" });
@@ -15,14 +16,33 @@ chrome.commands.onCommand.addListener((command) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "EXECUTE_PASTE" });
       }
     });
+    
+  }
+  
+  if (command === "pause-vibe") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "TOGGLE_PAUSE" });
+      }
+    });
   }
 });
 
-// listen for SS requests from the content script
+// listen for Internal Messages (Popup Clicks & Screenshots)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
+  // handle the Popup Button-Click
+  if (request.action === "TRIGGER_FROM_POPUP") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "TOGGLE_SELECTION" });
+      }
+    });
+    return true;
+  }
+
+  // Handle the Screenshot Request
   if (request.action === "CAPTURE_SCREENSHOT") {
-    
-    // use the native chrome api to take SS
     chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
       if (chrome.runtime.lastError) {
         console.error("VibePaste Screenshot Error:", chrome.runtime.lastError.message);
@@ -34,6 +54,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ success: true, dataUrl: dataUrl });
     });
 
-    return true; 
+    return true;
   }
 });

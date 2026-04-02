@@ -8,6 +8,21 @@ let sessionState = {
   selectedElements: []
 };
 
+// fetch saved mode when the page first loads
+chrome.storage.local.get(['vibepaste_mode'], (result) => {
+  if (result.vibepaste_mode) {
+    sessionState.mode = result.vibepaste_mode;
+  }
+});
+
+// listen for live changes from the popup toggle.
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'local' && changes.vibepaste_mode) {
+    sessionState.mode = changes.vibepaste_mode.newValue;
+    console.log(`VibePaste: Mode live-updated to [${sessionState.mode}]`);
+  }
+});
+
 // initialize ui & grab the inputs
 const { input: vpInput, micBtn } = window.VP_UI.init();
 
@@ -35,9 +50,33 @@ function toggleSelectionMode() {
   console.log(`VibePaste: Selection mode ${sessionState.isActive ? 'ON' : 'OFF'}`);
 }
 
-chrome.runtime.onMessage.addListener((request) => {
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
+  if (request.action === "IS_ACTIVE") { // for popup finish capturing
+    sendResponse({ isActive: sessionState.isActive });
+    return true;
+  }
+
   if (request.action === "TOGGLE_SELECTION") {
-    toggleSelectionMode();
+    if (sessionState.isActive && sessionState.selectedElements.length > 0) {
+      vpInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })); // fake enter
+    } else {
+      toggleSelectionMode();
+    }
+  }
+
+  if (request.action === "TOGGLE_PAUSE") {
+    if (sessionState.isActive) {
+      sessionState.isPaused = !sessionState.isPaused;
+      
+      if (sessionState.isPaused) {
+        window.VP_UI.hideHoverOverlay();
+        console.log('VibePaste: Paused for Interaction');
+      } else {
+        console.log('VibePaste: Resumed Selection');
+      }
+    }
   }
 });
 
@@ -96,8 +135,15 @@ document.addEventListener('click', (e) => {
     } else {
       sessionState.selectedElements.push(target);
       console.log(`VibePaste: Element selected. Total: ${sessionState.selectedElements.length}`);
-    }
 
+      if (sessionState.selectedElements.length === 1) {
+        chrome.storage.local.get(['vp_auto_mic'], (result) => {
+          if (result.vp_auto_mic && !window.VP_Voice.isListening) {
+            micBtn.click();
+          }
+        });
+      }
+    }
     window.VP_UI.hideHoverOverlay();
     redrawAllOverlays();
     vpInput.focus();
@@ -117,30 +163,15 @@ function redrawAllOverlays() {
     window.VP_UI.createStaticOverlay(el, index + 1);
   });
 }
-
+  
 // keyboard shortcuts
+
 document.addEventListener('keydown', (e) => {
+  // Escape to exit
   if (e.key === 'Escape' && sessionState.isActive) {
     toggleSelectionMode();
   }
-});
-
-document.addEventListener('keyup', (e) => {
-  if (e.key.toLowerCase() === 'p' && sessionState.isActive) {
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') {
-      return; 
-    }
-
-    sessionState.isPaused = !sessionState.isPaused;
-
-    if (sessionState.isPaused) {
-      window.VP_UI.hideHoverOverlay();
-      console.log('VibePaste: Paused for Interaction');
-    } else {
-      console.log('VibePaste: Resumed Selection');
-    }
-  }
-});
+})
 
 vpInput.addEventListener('input', (e) => {
   sessionState.intent = e.target.value;
@@ -198,10 +229,6 @@ vpInput.addEventListener('keydown', async (e) => {
   }
 });
 
-
-vpInput.addEventListener('keyup', (e) => {
-    e.stopPropagation();
-});
 
 function updateOverlayPositions() {
   if (!sessionState.isActive) return;

@@ -7,6 +7,7 @@
   micBtn: null,
 
   init: function() {
+
     // create hover overlay
     this.hoverOverlay = document.createElement('div');
     this.hoverOverlay.className = 'vibepaste-hover-overlay';
@@ -73,11 +74,6 @@
   toggleCommandBar: function(show) {
     if (this.commandBar) {
       this.commandBar.style.display = show ? 'block' : 'none';
-      if (show) {
-        setTimeout(() => {
-          this.vpInput.focus();
-        }, 10);
-      }
     }
   }
 };
