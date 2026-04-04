@@ -28,17 +28,11 @@ window.VP_Action = {
       let screenshotDataUrl = null;
 
       if (shouldTakeScreenshot) {
-        document.body.classList.add('vibepaste-capturing');
+        await window.VP_UI.prepareForScreenshot();
         
-        await new Promise(resolve => {
-          window.requestAnimationFrame(() => {
-            setTimeout(resolve, 150);
-          });
-        });
-
         const screenshotResponse = await chrome.runtime.sendMessage({ action: "CAPTURE_SCREENSHOT" });
 
-        document.body.classList.remove('vibepaste-capturing');
+        window.VP_UI.restoreAfterScreenshot();
 
         if (screenshotResponse && screenshotResponse.success) {
           screenshotDataUrl = screenshotResponse.dataUrl;
@@ -50,12 +44,11 @@ window.VP_Action = {
         console.log("VibePaste: Screenshot skipped (disabled in settings).");
       }
 
-      // dompile Master Prompt
-      const finalPrompt = window.VP_Compiler.compilePrompt(
+      // compile Master Prompt
+      const finalPrompt = await window.VP_Compiler.compilePrompt(
         mode, 
         intent, 
-        extractedElements,
-        screenshotDataUrl
+        extractedElements
       );
 
       // save to extension's storage

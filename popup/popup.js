@@ -2,17 +2,83 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const btnCapture = document.getElementById('btn-capture');
-  const radioFix = document.getElementById('mode-fix');
-  const radioCopy = document.getElementById('mode-copy');
-  const toggleScreenshot = document.getElementById('toggle-screenshot');
-  const toggleAutoMic = document.getElementById('toggle-auto-mic');
+  const btnShortcuts = document.getElementById('btn-shortcuts');
   const btnReset = document.getElementById('btn-reset');
 
-  // Ask the page if VibePaste is running, and change the button dynamically
+  const SettingsManager = {
+    config: [
+      { key: 'vibepaste_mode', id: 'mode-fix', type: 'radio', default: 'fix' },
+      { key: 'vp_include_screenshot', id: 'toggle-screenshot', type: 'checkbox', default: true },
+      { key: 'vp_auto_mic', id: 'toggle-auto-mic', type: 'checkbox', default: false },
+      { key: 'vp_enable_guidance', id: 'toggle-guidance', type: 'checkbox', default: true }
+    ],
+
+    init: function() {
+      const keys = this.config.map(item => item.key);
+
+      chrome.storage.local.get(keys, (result) => {
+        this.config.forEach(item => {
+          
+          const value = result[item.key] !== undefined ? result[item.key] : item.default;
+
+          if (result[item.key] === undefined) this.save(item.key, value);
+
+          // to sync ui & storage
+          this.updateUI(item, value);
+          this.attachListener(item);
+        });
+
+        setTimeout(() => document.body.classList.remove('preload-transitions'), 20);
+      });
+    },
+
+    updateUI: function(item, value) {
+      if (item.type === 'checkbox') {
+        document.getElementById(item.id).checked = value;
+      } else if (item.type === 'radio') {
+        const radio = document.querySelector(`input[name="vp-mode"][value="${value}"]`);
+        if (radio) radio.checked = true;
+      }
+    },
+
+    attachListener: function(item) {
+      if (item.type === 'checkbox') {
+        document.getElementById(item.id).addEventListener('change', (e) => {
+          this.save(item.key, e.target.checked);
+        });
+      } else if (item.type === 'radio') {
+        document.querySelectorAll(`input[name="vp-mode"]`).forEach(radio => {
+          radio.addEventListener('change', (e) => {
+            if (e.target.checked) this.save(item.key, e.target.value);
+          });
+        });
+      }
+    },
+
+    save: function(key, value) {
+      chrome.storage.local.set({ [key]: value });
+    },
+
+    reset: function() {
+      chrome.storage.local.remove('vibepaste_data'); 
+
+      this.config.forEach(item => {
+        this.save(item.key, item.default);
+        this.updateUI(item, item.default);
+      });
+    }
+  };
+
+  
+  SettingsManager.init();
+
+
+  // UI BUTTONS' Logic
+  
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
       chrome.tabs.sendMessage(tabs[0].id, { action: "IS_ACTIVE" }, (response) => {
-       if (chrome.runtime.lastError) return; // Ignore un-injectable pages
+       if (chrome.runtime.lastError) return;
         
         if (response && response.isActive) {
           btnCapture.innerHTML = '<span class="target-icon">✅</span> Finish Capturing';
@@ -22,74 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // load last saved mode & settings
-  chrome.storage.local.get(['vibepaste_mode', 'vp_include_screenshot','vp_auto_mic'], (result) => {
-    
-    if (result.vibepaste_mode === 'copy') {
-      radioCopy.checked = true;
-    } else {
-      radioFix.checked = true;
-      if (!result.vibepaste_mode) {
-        chrome.storage.local.set({ vibepaste_mode: 'fix' });
-      }
-    }
-
-    // allow SS (Default: true)
-    if (result.vp_include_screenshot !== undefined) {
-      toggleScreenshot.checked = result.vp_include_screenshot;
-    } else {
-      chrome.storage.local.set({ vp_include_screenshot: true });
-    }
-
-    if (result.vp_auto_mic !== undefined) {
-      toggleAutoMic.checked = result.vp_auto_mic;
-    } else {
-      chrome.storage.local.set({ vp_auto_mic: false });
-    }
-
-    setTimeout(() => {
-      document.body.classList.remove('preload-transitions');
-    }, 20); 
-  });
-
-  // save mode when the user clicks the toggle
-  const saveMode = (e) => {
-    const selectedMode = e.target.value;
-    chrome.storage.local.set({ vibepaste_mode: selectedMode });
-  };
-  
-  radioFix.addEventListener('change', saveMode);
-  radioCopy.addEventListener('change', saveMode);
-
-  // save screenshot preference when clicked
-  toggleScreenshot.addEventListener('change', (e) => {
-    chrome.storage.local.set({ vp_include_screenshot: e.target.checked });
-  });
-
-  // save auto mic preference when clicked
-  toggleAutoMic.addEventListener('change', (e) => {
-    chrome.storage.local.set({ vp_auto_mic: e.target.checked });
-  });
-
-  // capture button
+  // "start capture" button
   btnCapture.addEventListener('click', () => {
     chrome.runtime.sendMessage({ action: "TRIGGER_FROM_POPUP" });
     window.close();
   });
 
-  // reset 
-    btnReset.addEventListener('click', () => {
-    chrome.storage.local.remove('vibepaste_data'); 
-
-    chrome.storage.local.set({ 
-      vibepaste_mode: 'fix', 
-      vp_include_screenshot: true,
-      vp_auto_mic: false
-    });
-
-    radioFix.checked = true;
-    toggleScreenshot.checked = true;
-    toggleAutoMic.checked = false;
+  // "reset" button
+  btnReset.addEventListener('click', () => {
+    SettingsManager.reset();
 
     btnReset.classList.add('vp-animate-reset');
     btnReset.textContent = '✅ Cleared!';
@@ -100,9 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 800);
   });
 
-
-// chrome's native shortcut manager
-const btnShortcuts = document.getElementById('btn-shortcuts');
+  // "shortcuts" button
   btnShortcuts.addEventListener('click', () => {
     chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
   });

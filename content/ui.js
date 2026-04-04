@@ -75,5 +75,38 @@
     if (this.commandBar) {
       this.commandBar.style.display = show ? 'block' : 'none';
     }
+  },
+
+  showInputSuccess: function(message) {
+    if (!this.vpInput) return;
+    this.vpInput.classList.add('vibepaste-input-success');
+    this.vpInput.value = message;
+    
+    setTimeout(() => {
+      this.vpInput.classList.remove('vibepaste-input-success');
+    }, 700);
+  },
+
+  showInputError: function(message, duration = 2000) {
+    if (!this.vpInput) return;
+    this.vpInput.classList.add('vibepaste-input-error');
+    if (message) this.vpInput.value = message;
+    
+    setTimeout(() => {
+      this.vpInput.classList.remove('vibepaste-input-error');
+    }, duration);
+  },
+  
+  prepareForScreenshot: async function() {
+    document.body.classList.add('vibepaste-capturing');
+
+    return new Promise(resolve => {
+      window.requestAnimationFrame(() => setTimeout(resolve, 150));
+    });
+  },
+
+  restoreAfterScreenshot: function() {
+    document.body.classList.remove('vibepaste-capturing');
   }
+
 };

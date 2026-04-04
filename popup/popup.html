@@ -29,22 +29,39 @@
     </div>
 
     <hr class="vp-divider" />
-    <div class="vp-setting-row">
-      <span title="Include a shot of user-visible screen">🖼️ Include Screenshot</span>
-      <label class="vp-switch">
-        <input type="checkbox" id="toggle-screenshot" checked />
-        <span class="vp-slider"></span>
-      </label>
-    </div>
-    <hr class="vp-divider" />
-    <div class="vp-setting-row">
-      <span title="Starts listening when you select your first element"
-        >🎙️ Auto-Start Mic</span
-      >
-      <label class="vp-switch">
-        <input type="checkbox" id="toggle-auto-mic" />
-        <span class="vp-slider"></span>
-      </label>
+
+    <div class="vp-settings-container">
+      <div class="vp-setting-row">
+        <span
+          title="Include a screenshot containing elements on your visible screen"
+          >🖼️ Include Screenshot</span
+        >
+        <label class="vp-switch">
+          <input type="checkbox" id="toggle-screenshot" checked />
+          <span class="vp-slider"></span>
+        </label>
+      </div>
+
+      <div class="vp-setting-row">
+        <span title="Starts listening your words when you select an element"
+          >🎙️ Auto-Start Mic</span
+        >
+        <label class="vp-switch">
+          <input type="checkbox" id="toggle-auto-mic" />
+          <span class="vp-slider"></span>
+        </label>
+      </div>
+
+      <div class="vp-setting-row">
+        <span
+          title="Starts injecting expert UI/UX rules in prompt based on your words"
+          >🧠 Smart Guidance</span
+        >
+        <label class="vp-switch">
+          <input type="checkbox" id="toggle-guidance" checked />
+          <span class="vp-slider"></span>
+        </label>
+      </div>
     </div>
 
     <hr class="vp-divider" />

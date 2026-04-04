@@ -1,5 +1,6 @@
 // content/selection.js
 
+// Initialization
 let sessionState = {
   mode: window.VP_Constants.MODES.FIX,
   isActive: false,
@@ -31,6 +32,9 @@ window.VP_Voice.init(micBtn, vpInput, (newText) => {
   sessionState.intent = newText;
 });
 
+
+// CORE LOGIC & HANDLERS
+
 function toggleSelectionMode() {
   sessionState.isActive = !sessionState.isActive;
 
@@ -50,17 +54,40 @@ function toggleSelectionMode() {
   console.log(`VibePaste: Selection mode ${sessionState.isActive ? 'ON' : 'OFF'}`);
 }
 
+function redrawAllOverlays() {
+  window.VP_UI.clearAllStaticOverlays();
+  sessionState.selectedElements.forEach((el, index) => {
+    window.VP_UI.createStaticOverlay(el, index + 1);
+  });
+}
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+function updateOverlayPositions() {
+  if (!sessionState.isActive) return;
 
-  if (request.action === "IS_ACTIVE") { // for popup finish capturing
+  document.querySelectorAll('.vibepaste-static-overlay').forEach(overlayBox => {
+    const el = overlayBox._vpTarget;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    
+    overlayBox.style.width = `${rect.width}px`;
+    overlayBox.style.height = `${rect.height}px`;
+    overlayBox.style.top = `${rect.top + window.scrollY}px`;
+    overlayBox.style.left = `${rect.left + window.scrollX}px`;
+  });
+}
+
+// --- Event Handlers ---
+
+function handleMessage(request, sender, sendResponse) {
+  if (request.action === "IS_ACTIVE") { 
     sendResponse({ isActive: sessionState.isActive });
     return true;
   }
 
   if (request.action === "TOGGLE_SELECTION") {
     if (sessionState.isActive && sessionState.selectedElements.length > 0) {
-      vpInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })); // fake enter
+      vpInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })); 
     } else {
       toggleSelectionMode();
     }
@@ -78,10 +105,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     }
   }
-});
+}
 
-// to track mouse movement 
-document.addEventListener('mousemove', (e) => {
+function handleMouseMove(e) {
   if (!sessionState.isActive || sessionState.isPaused) return;
 
   const target = e.target;
@@ -104,10 +130,9 @@ document.addEventListener('mousemove', (e) => {
   const elProps = target.getBoundingClientRect();
   const style = window.getComputedStyle(target);
   window.VP_UI.showHoverOverlay(elProps, style.borderRadius);
-});
+}
 
-// to select clicked element 
-document.addEventListener('click', (e) => {
+function handleMouseClick(e) {
   if (!sessionState.isActive || sessionState.isPaused) return;
 
   let target = e.target;
@@ -148,37 +173,25 @@ document.addEventListener('click', (e) => {
     redrawAllOverlays();
     vpInput.focus();
   }
-}, true);
+}
 
-// to clean display
-document.addEventListener('mouseleave', () => {
+function handleMouseLeave() {
   if (!sessionState.isActive) return;
   window.VP_UI.hideHoverOverlay();
-});
-
-// to sync UI with state
-function redrawAllOverlays() {
-  window.VP_UI.clearAllStaticOverlays();
-  sessionState.selectedElements.forEach((el, index) => {
-    window.VP_UI.createStaticOverlay(el, index + 1);
-  });
 }
-  
-// keyboard shortcuts
 
-document.addEventListener('keydown', (e) => {
-  // Escape to exit
+function handleGlobalKeydown(e) {
   if (e.key === 'Escape' && sessionState.isActive) {
     toggleSelectionMode();
   }
-})
+}
 
-vpInput.addEventListener('input', (e) => {
+function handleInputInput(e) {
   sessionState.intent = e.target.value;
   window.VP_Voice.stop();
-});
+}
 
-vpInput.addEventListener('keydown', async (e) => {
+async function handleInputKeydown(e) {
   if (e.key === 'Escape') {
     e.preventDefault();
     toggleSelectionMode();
@@ -187,7 +200,6 @@ vpInput.addEventListener('keydown', async (e) => {
   e.stopPropagation(); 
 
   if (e.key === 'Enter') {
-
     if (e.shiftKey) return; 
     
     e.preventDefault();
@@ -196,8 +208,7 @@ vpInput.addEventListener('keydown', async (e) => {
     
     if (sessionState.selectedElements.length === 0) {
       console.warn("VibePaste: No element selected!");
-      vpInput.classList.add('vibepaste-input-error');
-      setTimeout(() => vpInput.classList.remove('vibepaste-input-error'), 300);
+      window.VP_UI.showInputError(null, 300);
       return;
     }
 
@@ -209,47 +220,16 @@ vpInput.addEventListener('keydown', async (e) => {
 
     if (result.success) {
       console.log(`VibePaste: Copied ${result.count} elements to clipboard!`);
-      vpInput.classList.add('vibepaste-input-success');
-      vpInput.value = "Copied to clipboard! 🚀";
-    
-      setTimeout(() => {
-        vpInput.classList.remove('vibepaste-input-success');
-        toggleSelectionMode();
-      }, 700);
-
+      window.VP_UI.showInputSuccess("Copied to clipboard! 🚀");
+      setTimeout(toggleSelectionMode, 700);
     } else {
-      vpInput.value = "Error: Check console";
-      vpInput.classList.add('vibepaste-input-error');
-      
-      setTimeout(() => {
-        vpInput.classList.remove('vibepaste-input-error');
-        toggleSelectionMode();
-      }, 2000);
+      window.VP_UI.showInputError("Error: Check console");
+      setTimeout(toggleSelectionMode, 2000);
     }
   }
-});
-
-
-function updateOverlayPositions() {
-  if (!sessionState.isActive) return;
-
-  document.querySelectorAll('.vibepaste-static-overlay').forEach(overlayBox => {
-    const el = overlayBox._vpTarget;
-    if (!el) return;
-
-    const rect = el.getBoundingClientRect();
-    
-    overlayBox.style.width = `${rect.width}px`;
-    overlayBox.style.height = `${rect.height}px`;
-    
-    overlayBox.style.top = `${rect.top + window.scrollY}px`;
-    overlayBox.style.left = `${rect.left + window.scrollX}px`;
-  });
 }
 
 let isUpdatingPosition = false;
-
-// 1. onscroll ui handler
 function onScroll() {
   if (!sessionState.isActive) return;
   window.VP_UI.hideHoverOverlay();
@@ -263,21 +243,26 @@ function onScroll() {
   }
 }
 
-// 2. on resize ui handler
 let resizeTimeout;
 function onResize() {
   if (!sessionState.isActive) return;
   window.VP_UI.hideHoverOverlay();
 
-  // Clear the timer if the window is still moving
   clearTimeout(resizeTimeout);
-  
-  // Wait 100ms after the window STOPS moving before drawing the boxes
   resizeTimeout = setTimeout(() => {
     updateOverlayPositions();
   }, 100);
 }
 
-// Attach the separated listeners
+chrome.runtime.onMessage.addListener(handleMessage);
+
+document.addEventListener('mousemove', handleMouseMove);
+document.addEventListener('click', handleMouseClick, true);
+document.addEventListener('mouseleave', handleMouseLeave);
+document.addEventListener('keydown', handleGlobalKeydown);
+
+vpInput.addEventListener('input', handleInputInput);
+vpInput.addEventListener('keydown', handleInputKeydown);
+
 window.addEventListener('scroll', onScroll, { capture: true, passive: true });
 window.addEventListener('resize', onResize, { passive: true });
