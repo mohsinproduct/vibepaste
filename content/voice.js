@@ -47,8 +47,7 @@ window.VP_Voice = {
 
     this.recognition.onstart = () => {
       this.isListening = true;
-      micBtn.textContent = '🛑';
-      micBtn.style.filter = "grayscale(0) sepia(1) hue-rotate(320deg)";
+      window.VP_UI.updateMicUI(true);
       vpInput.placeholder = "Listening...";
     };
 
@@ -74,8 +73,7 @@ window.VP_Voice = {
           console.error("VibePaste: Failed to auto-restart mic", e);
         }
       } else {
-        micBtn.textContent = '🎙️';
-        micBtn.style.filter = "grayscale(1)";
+        window.VP_UI.updateMicUI(false);
         vpInput.placeholder = "What should the AI do? (Press Enter)";
         vpInput.focus();
       }

@@ -7,16 +7,24 @@
   </head>
   <body class="preload-transitions">
     <header class="vp-header">
-      <h1><span class="magic-sparkle">✨</span> VibePaste</h1>
+      <h1>
+        <img src="../assets/icons/sparkle.svg" class="vp-icon-lg" />VibePaste
+      </h1>
     </header>
 
     <div class="vp-mode-container">
       <div class="vp-toggle-wrapper">
         <input type="radio" id="mode-fix" name="vp-mode" value="fix" checked />
-        <label for="mode-fix" class="vp-toggle-btn">🔧 Fix</label>
+        <label for="mode-fix" class="vp-toggle-btn"
+          ><img src="../assets/icons/wrench.svg" class="vp-icon-sm" />
+          Fix</label
+        >
 
         <input type="radio" id="mode-copy" name="vp-mode" value="copy" />
-        <label for="mode-copy" class="vp-toggle-btn">📋 Copy</label>
+        <label for="mode-copy" class="vp-toggle-btn"
+          ><img src="../assets/icons/copy-simple.svg" class="vp-icon-sm" />
+          Copy</label
+        >
 
         <div class="vp-toggle-slider"></div>
       </div>
@@ -24,7 +32,12 @@
 
     <div class="vp-action-container">
       <button id="btn-capture" class="vp-hero-btn">
-        <span class="target-icon">🎯</span> Start Capturing
+        <img
+          src="../assets/icons/crosshair-simple.svg"
+          id="capture-icon"
+          class="vp-icon-md"
+        />
+        <span id="capture-text">Start Capturing</span>
       </button>
     </div>
 
@@ -34,7 +47,8 @@
       <div class="vp-setting-row">
         <span
           title="Include a screenshot containing elements on your visible screen"
-          >🖼️ Include Screenshot</span
+          ><img src="../assets/icons/monitor.svg" class="vp-icon-sm" /> Include
+          Screenshot</span
         >
         <label class="vp-switch">
           <input type="checkbox" id="toggle-screenshot" checked />
@@ -44,7 +58,8 @@
 
       <div class="vp-setting-row">
         <span title="Starts listening your words when you select an element"
-          >🎙️ Auto-Start Mic</span
+          ><img src="../assets/icons/microphone.svg" class="vp-icon-sm" />
+          Auto-Start Mic</span
         >
         <label class="vp-switch">
           <input type="checkbox" id="toggle-auto-mic" />
@@ -55,7 +70,9 @@
       <div class="vp-setting-row">
         <span
           title="Starts injecting expert UI/UX rules in prompt based on your words"
-          >🧠 Smart Guidance</span
+        >
+          <img src="../assets/icons/brain.svg" class="vp-icon-sm" /> Smart
+          Guidance</span
         >
         <label class="vp-switch">
           <input type="checkbox" id="toggle-guidance" checked />
@@ -73,9 +90,16 @@
       </div>
       <div class="vp-footer-actions">
         <button id="btn-shortcuts" class="vp-btn-secondary">
-          ⌨ Edit Shortcuts
+          <img src="../assets/icons/keyboard.svg" class="vp-icon-sm" /> Edit
+          Shortcuts
         </button>
-        <button id="btn-reset" class="vp-btn-danger">🔄 Reset</button>
+        <button id="btn-reset" class="vp-btn-danger">
+          <img
+            src="../assets/icons/arrows-counter-clockwise.svg"
+            class="vp-icon-sm"
+          />
+          Reset
+        </button>
       </div>
     </div>
 

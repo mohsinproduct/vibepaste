@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
        if (chrome.runtime.lastError) return;
         
         if (response && response.isActive) {
-          btnCapture.innerHTML = '<span class="target-icon">✅</span> Finish Capturing';
+          btnCapture.innerHTML = '<img src="../assets/icons/check-circle.svg" class="vp-icon-md" style="margin-right:8px;" /> Finish Capturing';
           btnCapture.style.background = 'linear-gradient(135deg, #007bff, #0056b3)';
         }
       });
@@ -99,11 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
     SettingsManager.reset();
 
     btnReset.classList.add('vp-animate-reset');
-    btnReset.textContent = '✅ Cleared!';
+    btnReset.innerHTML = '<img src="../assets/icons/check-circle.svg" class="vp-icon-sm" /> Cleared!';
 
     setTimeout(() => {
       btnReset.classList.remove('vp-animate-reset');
-      btnReset.textContent = '🔄 Reset';
+      btnReset.innerHTML = '<img src="../assets/icons/arrows-counter-clockwise.svg" class="vp-icon-sm" /> Reset';
     }, 800);
   });
 

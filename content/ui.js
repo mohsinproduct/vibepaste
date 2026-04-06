@@ -6,6 +6,14 @@
   vpInput: null,
   micBtn: null,
 
+  icons: {
+    mic_on: chrome.runtime.getURL('assets/icons/mic_on.svg'),
+    mic_off: chrome.runtime.getURL('assets/icons/mic_off.svg'),
+    stop: chrome.runtime.getURL('assets/icons/stop.svg'),
+    copy: chrome.runtime.getURL('assets/icons/copy.svg'),
+    wrench: chrome.runtime.getURL('assets/icons/wrench.svg')
+  },
+
   init: function() {
 
     // create hover overlay
@@ -17,10 +25,12 @@
     this.commandBar = document.createElement('div');
     this.commandBar.className = 'vibepaste-command-bar';
     this.commandBar.innerHTML = `
-      <div style="display: flex; gap: 8px; align-items: flex-end;">
-        <textarea id="vibepaste-input" placeholder="What should the AI do? (Press Enter)" rows="1" autocomplete="off"></textarea>
-        <button id="vibepaste-mic-btn" title="Voice Input" style="background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; margin-bottom: 6px;">🎙️</button>
-      </div>
+      <div style="display: flex; gap: 8px; align-items: center;"> 
+    <textarea id="vibepaste-input" placeholder="What should the AI do? (Press Enter)" rows="1" autocomplete="off"></textarea>
+    <button id="vibepaste-mic-btn" title="Voice Input" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center;">
+      <img src="${this.icons.mic_off}" style="width: 25px; height: 25px; display: block;" />
+    </button>
+  </div>
     `;
     
     document.body.appendChild(this.commandBar);
@@ -29,6 +39,21 @@
     this.micBtn = this.commandBar.querySelector('#vibepaste-mic-btn');
 
     return { input: this.vpInput, micBtn: this.micBtn };
+  },
+
+  updateMicUI: function(isListening) {
+    const iconImg = this.micBtn.querySelector('img');
+    if (!iconImg) return;
+    
+    iconImg.src = isListening ? this.icons.mic_on: this.icons.mic_off ;
+    
+    if (isListening) {
+      this.micBtn.classList.add('vibepaste-mic-active');
+      this.vpInput.placeholder = "Listening...";
+    } else {
+      this.micBtn.classList.remove('vibepaste-mic-active');
+      this.vpInput.placeholder = "What should the AI do? (Press Enter)";
+    }
   },
 
   createStaticOverlay: function(el, number) {

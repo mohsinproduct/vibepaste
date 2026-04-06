@@ -1,5 +1,25 @@
 /* content/styles.css */
 
+:root {
+  --vp-bar-bg: rgba(255, 255, 255, 0.85);
+  --vp-bar-border: rgba(0, 0, 0, 0.1);
+  --vp-input-bg: rgba(0, 0, 0, 0.05);
+  --vp-text: #1a1a1a;
+  --vp-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --vp-icon: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --vp-bar-bg: rgba(30, 30, 30, 0.85);
+    --vp-bar-border: rgba(255, 255, 255, 0.15);
+    --vp-input-bg: rgba(0, 0, 0, 0.4);
+    --vp-text: #ffffff;
+    --vp-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --vp-icon: brightness(0) invert(1);
+  }
+}
+
 /* overlays */
 .vibepaste-hover-overlay,
 .vibepaste-static-overlay {
@@ -52,31 +72,42 @@
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000000;
-  background: #1e1e1e;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  display: none; /* Hidden by default */
-  width: 400px;
+  z-index: 2000000000;
+  background: var(--vp-bar-bg);
+  border: 1px solid var(--vp-bar-border);
+  box-shadow: var(--vp-shadow);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  padding: 10px 14px;
+  display: none;
+  max-width: 90vw;
+  width: 450px;
+  color: var(--vp-text);
 }
 
 .vibepaste-command-bar textarea {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #444;
-  border-radius: 4px;
-  background: #2d2d2d;
-  color: #fff;
-  font-family: sans-serif;
+  padding: 10px 14px;
+  border: 1px solid var(--vp-bar-border);
+  border-radius: 8px;
+  background: var(--vp-input-bg);
+  color: var(--vp-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
   resize: vertical;
   overflow-y: auto;
-  min-height: 38px;
   max-height: 150px;
-  field-sizing: content;
+  min-height: 40px;
+  scrollbar-width: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
 
@@ -87,27 +118,43 @@
 
 .vibepaste-command-bar textarea:focus {
   border-color: #007bff;
+  background: transparent;
 }
 
 /* mic button */
 #vibepaste-mic-btn {
   transition:
-    transform 0.1s ease,
-    filter 0.1s ease;
-  filter: grayscale(1);
+    transform 0.2s ease,
+    filter 0.2s ease,
+    opacity 0.2s ease;
+  filter: var(--vp-icon);
+  opacity: 0.6;
 }
 
 #vibepaste-mic-btn:hover {
   transform: scale(1.2);
-  filter: grayscale(0);
 }
 
 #vibepaste-mic-btn:active {
   transform: scale(0.9);
 }
 
-.vibepaste-mic-active {
-  filter: grayscale(0) sepia(1) hue-rotate(320deg) !important;
+/* mic img */
+#vibepaste-mic-btn img {
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+  filter: var(--icon-filter) opacity(0.7);
+}
+
+#vibepaste-mic-btn:hover img {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.vibepaste-mic-active img {
+  opacity: 1 !important;
+  filter: var(--vp-icon) drop-shadow(0 0 6px #ff4d4d) !important;
 }
 
 /* dynamic input states */
