@@ -223,7 +223,7 @@ body {
   border-radius: 50%;
 }
 input:checked + .vp-slider {
-  background-color: #28a745; /* Green when active */
+  background-color: #28a745;
 }
 input:checked + .vp-slider:before {
   transform: translateX(18px);

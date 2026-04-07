@@ -39,6 +39,16 @@ window.VP_Extractor = {
 
   extractHTML: function(element) {
     const clone = element.cloneNode(true);
+
+    const svgs = clone.querySelectorAll('svg');
+    svgs.forEach(svg => { svg.innerHTML = ''; });
+
+    const imgs = clone.querySelectorAll('img');
+    imgs.forEach(img => {
+      if (img.src && img.src.length > 100) {
+        img.src = 'data:image/...truncated...';
+      }
+    });
     return clone.outerHTML;
   },
 

@@ -11,7 +11,8 @@
     mic_off: chrome.runtime.getURL('assets/icons/mic_off.svg'),
     stop: chrome.runtime.getURL('assets/icons/stop.svg'),
     copy: chrome.runtime.getURL('assets/icons/copy.svg'),
-    wrench: chrome.runtime.getURL('assets/icons/wrench.svg')
+    wrench: chrome.runtime.getURL('assets/icons/wrench.svg'),
+    logo: chrome.runtime.getURL('assets/icons/logo.svg')
   },
 
   init: function() {
@@ -25,7 +26,8 @@
     this.commandBar = document.createElement('div');
     this.commandBar.className = 'vibepaste-command-bar';
     this.commandBar.innerHTML = `
-      <div style="display: flex; gap: 8px; align-items: center;"> 
+      <div style="display: flex; gap: 8px; align-items: center;">
+      <img src="${this.icons.logo}" style="width: 24px; height: 24px; border-radius: 6px;" alt="VibePaste" />
     <textarea id="vibepaste-input" placeholder="What should the AI do? (Press Enter)" rows="1" autocomplete="off"></textarea>
     <button id="vibepaste-mic-btn" title="Voice Input" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center;">
       <img src="${this.icons.mic_off}" style="width: 25px; height: 25px; display: block;" />

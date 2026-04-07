@@ -1,145 +1,57 @@
 // core/compiler.js
 
 window.VP_Compiler = {
-  buildElementsBlock: function(elements, isFixMode) {
+  buildElementsBlock: function(elements) {
     return elements.map(el => {
-      const stylesString = Object.entries(el.styles)
-        .map(([prop, value]) => `${prop}: ${value};`)
-        .join('\n');
-
-      if (isFixMode) {
-        return `
-# Element ${el.index}
-selector: ${el.selector}
-
-HTML:
-\`\`\`html
-${el.html}
-\`\`\`
-
-STYLES:
-\`\`\`css
-${stylesString}
-\`\`\`
-        `.trim();
-      } else {
-        return `
-# Element ${el.index}
-selector: ${el.selector}
-
-STRUCTURE:
-${el.html}
-
-VISUAL:
-${stylesString}
-        `.trim();
-      }
+      // compress styles to a single line for context efficiency
+      const s = Object.entries(el.styles).map(([p, v]) => `${p}:${v}`).join('; ');
+      return `[#${el.index}] Selector: ${el.selector}\nHTML: ${el.html}\nCSS: ${s}`;
     }).join('\n\n');
   },
 
-  buildSystemBlock: function(isFixMode) {
+  getRules: function(isFixMode) {
+    // Core logic
+    const common = "\n1. If Additional Guidance or Rules conflict with Intent, ALWAYS follow Intent.\n2. Code in existing language/framework (Vue/React/etc).\n3. no talk/no markdown/no outside conventions while generating code.\n4. If in a codebase, Apply changes globally to all related files/elements/classes in project, not just the one selected element or provided in a screenshot.";
+
     if (isFixMode) {
-      return `
-You are an expert frontend developer.
-
-GOAL:
-Modify the given UI elements based on the user's intent.
-
-RULES:
-- The user's intent is the highest priority.
-- If additional guidance conflicts with the intent, ignore the guidance.
-- Make minimal, precise changes (do not rewrite everything).
-- Preserve existing structure, classes, and styling approach.
-- Output ONLY the updated code (no explanations or following user's codebase conventions (if present)).
-      `.trim();
-    } else {
-      return `
-You are an expert UI/UX engineer.
-
-GOAL:
-Generate a clean, reusable component inspired by the reference elements.
-
-RULES:
-- The user's intent is the highest priority.
-- If additional guidance conflicts with the intent, ignore the guidance.
-- Do NOT copy blindly — create a proper abstraction.
-- Improve structure, reusability, and clarity.
-- Output ONLY the final code (no explanations or following user's codebase conventions (if present)).
-      `.trim();
+      // fix Mode: minimal changes and global application
+      return `${common}\n5. Make minimal, precise changes; do not rewrite everything. \n6. Preserve existing structure, classes, and styling approach.`;
     }
+    // copy Mode: abstraction and improvement
+    return `${common}\n5. Create proper abstraction; do not copy blindly.\n6. Improve structure, reusability, and clarity.\n7. This inspiration design shouldn't feel alienated if integrating in existing project.`;
   },
 
   buildGuidanceBlock: function(intent, isFixMode) {
-    if (!intent) return "";
-
+    if (!intent) return "None";
     const rules = [
-      {
-        match: /(modern|clean|improve|better)/i,
-        text: "- Improve visual hierarchy, spacing, and typography"
-      },
-      {
-        match: /(align|center|position)/i,
-        text: "- Fix alignment using flexbox or grid with proper spacing"
-      },
-      {
-        match: /(responsive|mobile)/i,
-        text: "- Ensure responsiveness across screen sizes"
-      },
-      {
-        match: /(spacing|padding|margin|gap)/i,
-        text: "- Adjust spacing for visual balance"
-      },
-      {
-        match: /(color|theme|style)/i,
-        text: "- Improve colors and contrast for better UX"
-      },
-      {
-        match: /(previous|revert|undo|rollback|instead)/i,
-        text: "- Discard the most recent failed attempt. Base your new modifications strictly on the last known working version of the code from our chat history."
-      }
+      { match: /modern|clean|improve|better/i, text: "Improve visual hierarchy and typography." },
+      { match: /align|center|position/i, text: "Fix alignment via flex/grid." },
+      { match: /responsive|mobile/i, text: "Ensure mobile responsiveness." },
+      { match: /spacing|padding|margin|gap/i, text: "Balance spacing and margins." },
+      { match: /color|theme|style/i, text: "Improve contrast and colors." },
+      { match: /previous|revert|undo|rollback/i, text: "Revert attempt; use last working code from history." }
     ];
+    if (!isFixMode) rules.push({ match: /react|vue|svelte|extract/i, text: "Encapsulate as reusable component with props." });
 
-    if (!isFixMode) {
-      rules.push({
-        match: /(react|vue|svelte|component|extract)/i,
-        text: "- Extract this into a fully encapsulated, highly reusable component with proper props/state."
-      });
-    }
-
-    const matched = rules
-      .filter(rule => rule.match.test(intent))
-      .map(rule => rule.text);
-
-    if (matched.length === 0) return "";
-    return matched.join('\n');
+    const matched = rules.filter(r => r.match.test(intent)).map(r => "- " + r.text);
+    return matched.length ? matched.join('\n') : "None";
   },
 
   compilePrompt: async function(mode, intent, extractedElements) {
     const isFixMode = mode === window.VP_Constants.MODES.FIX;
-    const elementsBlock = this.buildElementsBlock(extractedElements, isFixMode);
-    const systemBlock = this.buildSystemBlock(isFixMode);
-
     const storage = await chrome.storage.local.get(['vp_enable_guidance']);
-    const guidanceEnabled = storage.vp_enable_guidance !== false;
+    const guidance = (storage.vp_enable_guidance !== false) ? this.buildGuidanceBlock(intent, isFixMode) : "None";
 
-    let guidanceBlock = "";
-    if (guidanceEnabled) {
-      const generatedGuidance = this.buildGuidanceBlock(intent, isFixMode);
-      if (generatedGuidance) {
-        guidanceBlock = `\n\nADDITIONAL GUIDANCE:\n${generatedGuidance}`;
-      }
-    }
+    return `System: You're an expert UI/UX developer.
+Rules:
+${this.getRules(isFixMode)}
 
-    return `
-SYSTEM:
-${systemBlock}
+User Intent (Highest Priority): ${intent || "Optimize code"}
 
-USER INTENT:
-${intent || "No explicit intent provided"}
-${guidanceBlock}
+Additional Guidance:
+${guidance}
 
-TARGET ELEMENTS:
-${elementsBlock}
-    `.trim();
+Target Elements:
+${this.buildElementsBlock(extractedElements)}`.trim();
   }
 };
