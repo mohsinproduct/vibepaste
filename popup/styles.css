@@ -330,3 +330,7 @@ input:checked + .vp-slider:before {
   align-items: center;
   justify-content: center;
 }
+
+.vp-logo-full-color {
+  filter: none !important;
+}
