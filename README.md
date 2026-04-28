@@ -29,7 +29,7 @@ Whether you're **fixing** a broken UI or **copying** a beautiful design, VibePas
 
 5. **Describe what you want** in the command bar (type or use voice with the mic).
 
-6. **Press `Enter`** — VibePaste copies a rich prompt + screenshot to your clipboard.
+6. **Press `Enter`** —> VibePaste copies a rich prompt + screenshot to your clipboard.
 
 7. **Paste (`Alt + V`)** directly into Claude, Cursor or your favorite AI tool.
 
