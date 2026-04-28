@@ -6,17 +6,16 @@ VibePaste is a powerful Chrome extension that lets you **select any element(s) o
 
 Whether you're **fixing** a broken UI or **copying** a beautiful design, VibePaste dramatically speeds up your frontend development workflow.
 
-![VibePaste Demo](https://via.placeholder.com/800x450?text=VibePaste+Demo+GIF)
 
 ## ✨ Features
 
-- **Visual Element Selection** — Click to select multiple elements with live hover highlights
-- **Fix Mode vs Copy Mode** — Two intelligent modes optimized for different goals
-- **Voice Input** — Speak your intent hands-free (with auto mic option)
-- **Smart Screenshot** — Captures clean visual context (hides VibePaste UI automatically)
-- **One-Click Paste** — Paste prompt + image directly into your IDE or AI chat
-- **Keyboard Shortcuts** — Full keyboard control for power users
-- **Dark Mode Support** — Looks great everywhere
+- **Visual Element Selection** —> Click to select multiple elements with live hover highlights
+- **Fix Mode vs Copy Mode** —> Two intelligent modes optimized for different goals
+- **Voice Input** —> Speak your intent hands-free (with auto mic option)
+- **Smart Screenshot** —> Captures clean visual context (hides VibePaste UI automatically)
+- **One-Click Paste** —> Paste prompt + image directly into your IDE or AI chat
+- **Keyboard Shortcuts** —> Full keyboard control for power users
+- **Dark Mode Support** —> Looks great everywhere
 
 ## 🚀 Quick Start
 
