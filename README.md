@@ -2,7 +2,7 @@
 
 **Capture any UI → Get AI-ready code in seconds.**
 
-VibePaste is a powerful Chrome extension that lets you **select any element(s) on a webpage**, describe what you want in plain English (or voice), and instantly get a perfectly structured prompt + screenshot that you can paste into ChatGPT, Claude, Cursor, or any other LLM.
+VibePaste is a powerful Chrome extension that lets you **select any element(s) on a webpage**, describe what you want in plain English (or voice) and instantly get a perfectly structured prompt + screenshot that you can paste into ChatGPT, Claude, Cursor or any other LLM.
 
 Whether you're **fixing** a broken UI or **copying** a beautiful design, VibePaste dramatically speeds up your frontend development workflow.
 
@@ -31,7 +31,7 @@ Whether you're **fixing** a broken UI or **copying** a beautiful design, VibePas
 
 6. **Press `Enter`** — VibePaste copies a rich prompt + screenshot to your clipboard.
 
-7. **Paste (`Alt + V`)** directly into Claude, Cursor, or your favorite AI tool.
+7. **Paste (`Alt + V`)** directly into Claude, Cursor or your favorite AI tool.
 
 ### Keyboard Shortcuts
 
@@ -50,7 +50,7 @@ You can customize these in `chrome://extensions/shortcuts`.
 
 ## Full Documentation
 
-For detailed technical information, architecture, and advanced usage, visit the **[Documentation](/docs)**.
+For detailed technical information, architecture and advanced usage, visit the **[Documentation](/docs)**.
 
 ## Contributing
 
