@@ -1,0 +1,1 @@
+VibePaste is a browser extension designed to capture UI elements and their context to generate high-fidelity AI coding prompts. It bridges the gap between a visual web interface and an LLM by extracting DOM structures, computed styles, and visual screenshots, then compiling them into structured instructions for tasks like UI debugging ("Fix") or component replication ("Copy").
