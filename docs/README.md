@@ -1,0 +1,26 @@
+# mohsinproduct-vibepaste-DeepWiki
+
+## Content Index
+
+- [VibePaste-Overview](VibePaste-Overview.md)
+- [Extension-Architecture-&-Manifest](Extension-Architecture-&-Manifest.md)
+- [User-Interaction-Flows](User-Interaction-Flows.md)
+- [Core-Processing-Pipeline](Core-Processing-Pipeline.md)
+- [DOM-Extraction-(VP_Extractor)](DOM-Extraction-(VP_Extractor).md)
+- [Prompt-Compilation-(VP_Compiler)](Prompt-Compilation-(VP_Compiler).md)
+- [Action-Orchestration-(VP_Action)](Action-Orchestration-(VP_Action).md)
+- [Content-Scripts](Content-Scripts.md)
+- [Selection-Engine-(VP_Selection)](Selection-Engine-(VP_Selection).md)
+- [UI-Overlay-System-(VP_UI)](UI-Overlay-System-(VP_UI).md)
+- [Voice-Input-(VP_Voice)](Voice-Input-(VP_Voice).md)
+- [Content-Injector-(VP_Injector)](Content-Injector-(VP_Injector).md)
+- [Popup-Interface](Popup-Interface.md)
+- [Popup-UI-&-Styling](Popup-UI-&-Styling.md)
+- [Popup-Logic-&-Settings-Manager](Popup-Logic-&-Settings-Manager.md)
+- [Background-Service-Worker](Background-Service-Worker.md)
+- [Keyboard-Command-Routing](Keyboard-Command-Routing.md)
+- [Screenshot-Capture-Pipeline](Screenshot-Capture-Pipeline.md)
+- [Assets-&-Icon-System](Assets-&-Icon-System.md)
+- [Extension-Toolbar-Icons](Extension-Toolbar-Icons.md)
+- [Content-UI-SVG-Icons](Content-UI-SVG-Icons.md)
+- [Glossary](Glossary.md)

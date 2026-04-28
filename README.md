@@ -1,61 +1,53 @@
-# VibePaste
+﻿# VibePaste
 
-**Capture any UI → Get AI-ready code in seconds.**
+**Capture any UI on the web → Get perfect AI prompts instantly.**
 
-VibePaste is a powerful Chrome extension that lets you **select any element(s) on a webpage**, describe what you want in plain English (or voice) and instantly get a perfectly structured prompt + screenshot that you can paste into ChatGPT, Claude, Cursor or any other LLM.
+VibePaste is a Chrome extension that lets you **select elements** on any website, describe what you want (with text or voice), and instantly copy a rich, context-aware prompt + screenshot ready to paste into Claude, Cursor, ChatGPT, or any LLM.
 
-Whether you're **fixing** a broken UI or **copying** a beautiful design, VibePaste dramatically speeds up your frontend development workflow.
+Say goodbye to manually describing UIs — just **select → describe → paste**.
 
+## ✨ Key Features
 
-## ✨ Features
-
-- **Visual Element Selection** —> Click to select multiple elements with live hover highlights
-- **Fix Mode vs Copy Mode** —> Two intelligent modes optimized for different goals
-- **Voice Input** —> Speak your intent hands-free (with auto mic option)
-- **Smart Screenshot** —> Captures clean visual context (hides VibePaste UI automatically)
-- **One-Click Paste** —> Paste prompt + image directly into your IDE or AI chat
-- **Keyboard Shortcuts** —> Full keyboard control for power users
-- **Dark Mode Support** —> Looks great everywhere
+- Visual element selection with hover highlights and numbered badges
+- **Fix Mode** vs **Copy Mode** — intelligent prompts for different goals
+- Voice input support (hands-free with auto-mic option)
+- Automatic clean screenshot capture (hides VibePaste UI)
+- One-click paste with Alt + V
+- Fully keyboard driven workflow
+- Clean modern UI with dark mode support
 
 ## 🚀 Quick Start
 
-1. **Install** VibePaste from the [Chrome Web Store](#) *(coming soon)* or load it unpacked.
-
-2. **Open any webpage** where you want to work on UI.
-
-3. **Press `Alt + C`** to start capturing.
-
-4. **Click on elements** you want to fix or copy.
-
-5. **Describe what you want** in the command bar (type or use voice with the mic).
-
-6. **Press `Enter`** —> VibePaste copies a rich prompt + screenshot to your clipboard.
-
-7. **Paste (`Alt + V`)** directly into Claude, Cursor or your favorite AI tool.
+1. Install VibePaste (Chrome Web Store coming soon) or load it unpacked.
+2. Go to any website.
+3. Press **Alt + C** to start selection mode.
+4. Click the UI elements you want to fix or copy.
+5. Type or speak your intent in the command bar.
+6. Press **Enter** — prompt + screenshot is copied to clipboard.
+7. Paste into your AI tool with **Alt + V**.
 
 ### Keyboard Shortcuts
 
-| Shortcut     | Action                        |
-|-------------|-------------------------------|
-| `Alt + C`   | Start / Stop selection mode   |
-| `Alt + V`   | Paste the generated prompt    |
-| `Alt + P`   | Pause / Resume selection      |
+| Shortcut   | Action                              |
+|------------|-------------------------------------|
+| Alt + C  | Toggle selection mode               |
+| Alt + V  | Paste generated prompt              |
+| Alt + P  | Pause / Resume hover selection      |
 
-You can customize these in `chrome://extensions/shortcuts`.
+Customize them anytime in chrome://extensions/shortcuts.
 
-## Modes
+## 📖 Documentation
 
-- **Fix Mode** (`🔧`): Best for debugging and improving existing UI components.
-- **Copy Mode** (`📋`): Best for learning from or recreating beautiful designs.
+Detailed guides are available in the [docs/](./docs) folder:
 
-## Full Documentation
-
-For detailed technical information, architecture and advanced usage, visit the **[Documentation](/docs)**.
+- **[User Guide](./docs/user-guide.md)** ← Start here
+- [Architecture Overview](./docs/architecture.md)
+- [Full Documentation](./docs/index.md)
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Contributions, bug reports, and feature requests are welcome!
 
 ---
 
-**Made with ❤️ for frontend developers**
+**Built for frontend developers who love beautiful, fast UIs.**
