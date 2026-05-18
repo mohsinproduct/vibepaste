@@ -18,7 +18,7 @@ window.VP_Compiler = {
       return `${common}\n5. Make minimal, precise changes; do not rewrite everything. \n6. Preserve existing structure, classes, and styling approach.`;
     }
     // copy Mode: abstraction and improvement
-    return `${common}\n5. Create proper abstraction; do not copy blindly.\n6. Improve structure, reusability, and clarity.\n7. This inspiration design shouldn't feel alienated if integrating in existing project.`;
+    return `${common}\n5. Create proper abstraction ( after that add in my project ) and do not copy exactly until asked. \n6. The output design shouldn't feel odd when integrating in existing project.\n7. Improve structure, reusability, and clarity.\n8. Preserve my project elements and theme them according to prompt (either on the theme of my project (default) or from inspiration design (when copying exactly)).`;
   },
 
   buildGuidanceBlock: function(intent, isFixMode) {
