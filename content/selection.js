@@ -183,7 +183,7 @@ window.VP_Selection = {
       );
 
       if (result.success) {
-        window.VP_UI.showInputSuccess("Copied to clipboard! 🚀");
+        window.VP_UI.showInputSuccess("Vibe Captured! 🚀");
         setTimeout(() => this.toggleSelectionMode(), 700);
       } else {
         window.VP_UI.showInputError("Error: Check console");
